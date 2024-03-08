@@ -5,6 +5,7 @@ namespace SciChain
         public MainForm()
         {
             InitializeComponent();
+            /*
             Blockchain scichain = new Blockchain();
             scichain.AddBlock(new Block(DateTime.Now, scichain.GetLatestBlock().Hash, "Block 1 Data"));
             scichain.AddBlock(new Block(DateTime.Now, scichain.GetLatestBlock().Hash, "Block 2 Data"));
@@ -19,6 +20,13 @@ namespace SciChain
                 Console.WriteLine($"Data: {block.Data}");
                 Console.WriteLine();
             }
+            */
+        }
+
+        private void loginBut_Click(object sender, EventArgs e)
+        {
+            string token = OAuthHelper.StartListenerAsync().Result;
+            bool res = OrcidAuthentication.AuthenticateOrcidId(idBox.Text, token).Result;
         }
     }
 }
