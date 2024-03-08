@@ -1,7 +1,10 @@
+using static SciChain.OrcidAuthentication;
+
 namespace SciChain
 {
     public partial class MainForm : Form
     {
+        private string token;
         public MainForm()
         {
             InitializeComponent();
@@ -25,8 +28,8 @@ namespace SciChain
 
         private void loginBut_Click(object sender, EventArgs e)
         {
-            string token = OAuthHelper.StartListenerAsync().Result;
-            bool res = OrcidAuthentication.AuthenticateOrcidId(idBox.Text, token).Result;
+            token = OAuthHelper.StartListenerAsync().Result;
+            toolStripStatusLabel.Text = "Logged In:" + token;
         }
     }
 }

@@ -11,22 +11,50 @@ using Newtonsoft.Json;
 using System.Net;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
+using static SciChain.Block;
 namespace SciChain
 {
     public class Block
     {
+        public class Transaction
+        {
+            public string FromAddress { get; set; }
+            public string ToAddress { get; set; }
+            public string PublicKey { get; set; }
+            public decimal Amount { get; set; }
+            public string Signature { get; set; }
+            public Transaction(string fromAddress, string toAddress, decimal amount)
+            {
+                FromAddress = fromAddress;
+                ToAddress = toAddress;
+                Amount = amount;
+            }
+            public void SignTransaction(RSAParameters privateKey, string fromAddress)
+            {
+                var dataToSign = fromAddress + ToAddress + Amount.ToString();
+                using (var rsa = new RSACryptoServiceProvider())
+                {
+                    rsa.ImportParameters(privateKey);
+                    var dataToSignBytes = Encoding.UTF8.GetBytes(dataToSign);
+                    var hasher = new SHA256Managed();
+                    var hashedData = hasher.ComputeHash(dataToSignBytes);
+                    Signature = Convert.ToBase64String(rsa.SignData(hashedData, CryptoConfig.MapNameToOID("SHA256")));
+                }
+            }
+        }
         public int Index { get; set; } // Position of the block on the chain
         public DateTime TimeStamp { get; set; } // When the block was created
         public string PreviousHash { get; set; } // The hash of the previous block
-        public string Data { get; set; } // Your data (e.g., transaction details)
+        public IList<Transaction> Transactions { get; set; }
         public string Hash { get; set; } // The block's hash
 
-        public Block(DateTime timeStamp, string previousHash, string data)
+        public Block(DateTime timeStamp, string previousHash, IList<Transaction> transactions)
         {
             Index = 0;
             TimeStamp = timeStamp;
             PreviousHash = previousHash;
-            Data = data;
+            Transactions = transactions;
             Hash = CalculateHash();
         }
 
@@ -34,7 +62,7 @@ namespace SciChain
         {
             using (SHA256 sha256 = SHA256.Create())
             {
-                string rawData = $"{TimeStamp}-{PreviousHash ?? ""}-{Data}";
+                string rawData = $"{TimeStamp}-{PreviousHash ?? ""}-{JsonConvert.SerializeObject(Transactions)}";
                 byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(rawData));
                 return BitConverter.ToString(bytes).Replace("-", "").ToLowerInvariant();
             }
@@ -42,17 +70,26 @@ namespace SciChain
     }
     public class Blockchain
     {
+        public int currentHeight = 0;
+        public List<Transaction> PendingTransactions = new List<Transaction>();
         public IList<Block> Chain { set; get; }
-
+        public decimal totalSupply = 100000000;
+        public decimal currentSupply = 0;
+        public const decimal miningReward = 10;
         public Blockchain()
         {
             InitializeChain();
             AddGenesisBlock();
         }
-
+        string dir = System.IO.Path.GetDirectoryName(Environment.ProcessPath);
         private void InitializeChain()
         {
+            Settings.Load();
+            string h = Settings.GetSettings("Height");
+            if(h!="")
+            currentHeight = int.Parse(h);
             Chain = new List<Block>();
+            Directory.CreateDirectory(dir + "/Blocks");
         }
 
         private void AddGenesisBlock()
@@ -62,12 +99,35 @@ namespace SciChain
 
         private Block CreateGenesisBlock()
         {
-            return new Block(DateTime.Now, null, "{}");
+            return new Block(DateTime.Now, null, null);
         }
 
         public Block GetLatestBlock()
         {
             return Chain[Chain.Count - 1];
+        }
+
+        public decimal GetBalance(string address)
+        {
+            decimal balance = 0;
+
+            foreach (var block in Chain)
+            {
+                foreach (var trans in block.Transactions)
+                {
+                    if (trans.FromAddress == address)
+                    {
+                        balance -= trans.Amount;
+                    }
+
+                    if (trans.ToAddress == address)
+                    {
+                        balance += trans.Amount;
+                    }
+                }
+            }
+
+            return balance;
         }
 
         public void AddBlock(Block block)
@@ -77,6 +137,79 @@ namespace SciChain
             block.PreviousHash = latestBlock.Hash;
             block.Hash = block.CalculateHash();
             Chain.Add(block);
+        }
+
+        public bool CreateTransaction(Transaction transaction)
+        {
+            if (!VerifyTransaction(transaction))
+            {
+                Console.WriteLine("Transaction failed: Not a valid transaction.");
+                return false;
+            }
+            // Proceed with adding the transaction
+            if (transaction.FromAddress != null)
+            {
+                var senderBalance = GetBalance(transaction.FromAddress);
+
+                if (senderBalance < transaction.Amount)
+                {
+                    Console.WriteLine("Transaction failed: Not enough balance.");
+                    return false;
+                }
+            }
+
+            PendingTransactions.Add(transaction);
+            return true;
+        }
+        public bool VerifyTransaction(Transaction transaction)
+        {
+            using (var rsa = new RSACryptoServiceProvider())
+            {
+                try
+                {
+                    rsa.ImportParameters(RSA.StringToRSAParameters(transaction.PublicKey));
+                    var dataToVerify = transaction.FromAddress + transaction.ToAddress + transaction.Amount.ToString();
+                    var dataToVerifyBytes = Encoding.UTF8.GetBytes(dataToVerify);
+                    var hasher = new SHA256Managed();
+                    var hashedData = hasher.ComputeHash(dataToVerifyBytes);
+                    return rsa.VerifyData(hashedData, CryptoConfig.MapNameToOID("SHA256"), Convert.FromBase64String(transaction.Signature));
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+        public void MineBlock(string minerAddress)
+        {
+            List<Transaction> transactions = new List<Transaction>();
+            foreach (var transaction in PendingTransactions)
+            {
+                if(VerifyTransaction(transaction))
+                    transactions.Add(transaction);
+            }
+            var block = new Block(DateTime.Now, GetLatestBlock().Hash, transactions);
+            Chain.Add(block);
+            // Reset the pending transactions and send mining reward
+            PendingTransactions = new List<Transaction>();
+            CreateTransaction(new Transaction(null, minerAddress, miningReward));
+            if(currentSupply < totalSupply)
+            currentSupply += miningReward;
+        }
+
+        public class Wallet
+        {
+            public RSAParameters PublicKey { get; private set; }
+            public RSAParameters PrivateKey { get; private set; }
+
+            public Wallet()
+            {
+                using (var rsa = new RSACryptoServiceProvider(2048)) // 2048-bit key size
+                {
+                    PublicKey = rsa.ExportParameters(false); // Export the public key
+                    PrivateKey = rsa.ExportParameters(true); // Export the private key
+                }
+            }
         }
 
         public bool IsValid()
@@ -98,7 +231,72 @@ namespace SciChain
             }
             return true;
         }
+
+        public void Save()
+        {
+            Settings.AddSettings("Height",currentHeight.ToString());
+            Settings.Save();
+            foreach (var block in Chain)
+            {
+                string f = dir + "/Blocks/" + block.Index + ".json";
+                if(!File.Exists(f))
+                {
+                    File.WriteAllText(f, JsonConvert.SerializeObject(block, Formatting.Indented));
+                }
+            }
+        }
+
+        public void Load(string fileName)
+        {
+            foreach (var f in Directory.GetFiles(dir + "/Blocks/"))
+            {
+                var json = File.ReadAllText(fileName);
+                Block b = JsonConvert.DeserializeObject<Block>(json);
+                Chain.Add(b);
+            }
+        }
+
     }
+
+    public static class RSA
+    {
+        //Note we only store the public key parts of the RSA Parameters on purpose.
+        public static string RSAParametersToString(RSAParameters parameters)
+        {
+            // RSAParameters contains fields that are byte arrays and cannot be directly serialized by JsonConvert,
+            // so we create a serializable object to hold the data.
+            var paramsToSerialize = new
+            {
+                Modulus = parameters.Modulus != null ? Convert.ToBase64String(parameters.Modulus) : null,
+                Exponent = parameters.Exponent != null ? Convert.ToBase64String(parameters.Exponent) : null,
+                //P = parameters.P != null ? Convert.ToBase64String(parameters.P) : null,
+                //Q = parameters.Q != null ? Convert.ToBase64String(parameters.Q) : null,
+                //DP = parameters.DP != null ? Convert.ToBase64String(parameters.DP) : null,
+                //DQ = parameters.DQ != null ? Convert.ToBase64String(parameters.DQ) : null,
+                //InverseQ = parameters.InverseQ != null ? Convert.ToBase64String(parameters.InverseQ) : null,
+                //D = parameters.D != null ? Convert.ToBase64String(parameters.D) : null
+            };
+
+            return JsonConvert.SerializeObject(paramsToSerialize);
+        }
+        public static RSAParameters StringToRSAParameters(string jsonString)
+        {
+            var paramsFromJson = JsonConvert.DeserializeObject<dynamic>(jsonString);
+
+            return new RSAParameters
+            {
+                Modulus = paramsFromJson.Modulus != null ? Convert.FromBase64String(paramsFromJson.Modulus.ToString()) : null,
+                Exponent = paramsFromJson.Exponent != null ? Convert.FromBase64String(paramsFromJson.Exponent.ToString()) : null,
+                //P = paramsFromJson.P != null ? Convert.FromBase64String(paramsFromJson.P.ToString()) : null,
+                //Q = paramsFromJson.Q != null ? Convert.FromBase64String(paramsFromJson.Q.ToString()) : null,
+                //DP = paramsFromJson.DP != null ? Convert.FromBase64String(paramsFromJson.DP.ToString()) : null,
+                //DQ = paramsFromJson.DQ != null ? Convert.FromBase64String(paramsFromJson.DQ.ToString()) : null,
+                //InverseQ = paramsFromJson.InverseQ != null ? Convert.FromBase64String(paramsFromJson.InverseQ.ToString()) : null,
+                //D = paramsFromJson.D != null ? Convert.FromBase64String(paramsFromJson.D.ToString()) : null
+            };
+        }
+    }
+
     public static class OrcidAuthentication
     {
         private static readonly string clientId = "APP-PCZPI3V579SL36TV";
@@ -113,7 +311,7 @@ namespace SciChain
                 { "client_secret", clientSecret },
                 { "grant_type", "authorization_code" },
                 { "code", authorizationCode },
-                { "redirect_uri", "https://github.com/BiologyTools/SciChain" } // The redirect URI registered with ORCID
+                { "redirect_uri", "http://127.0.0.1:8000/" } // The redirect URI registered with ORCID
             };
 
             var content = new FormUrlEncodedContent(postData);
@@ -136,33 +334,6 @@ namespace SciChain
             public string AccessToken { get; set; }
             // Include other fields as necessary
         }
-        public static async Task<bool> AuthenticateOrcidId(string orcidId, string accessToken)
-        {
-            // URL for ORCID public API; adjust as needed for your use case
-                var url = $"https://pub.orcid.org/v3.0/{orcidId}/person";
-
-            // Add the access token in the Authorization header
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-
-            try
-            {
-                var response = await httpClient.GetAsync(url);
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    // Assuming you have a simple way to validate the content. In real scenarios, you would parse this content,
-                    // and validate the ORCID iD matches the expected user details.
-                    return true; // Simplified for illustration. Actual implementation should validate the response content.
-                }
-            }
-            catch (HttpRequestException e)
-            {
-                // Handle exceptions or errors in communication with the ORCID API
-                Console.WriteLine($"Error contacting ORCID API: {e.Message}");
-            }
-
-            return false;
-        }
     }
     public static class OAuthHelper
     {
@@ -179,9 +350,8 @@ namespace SciChain
             // Open the user's browser and direct them to the authorization URL
             string authorizationUrl = $"https://orcid.org/oauth/authorize?client_id=APP-PCZPI3V579SL36TV&response_type=code&scope=/authenticate&redirect_uri=http://127.0.0.1:8000";
             OpenUrl(authorizationUrl);
-
             // Wait for the authorization response
-            var context = await httpListener.GetContextAsync();
+            var context = httpListener.GetContext();
             var request = context.Request;
 
             // Extract the authorization code from the request

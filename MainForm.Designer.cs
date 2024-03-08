@@ -30,36 +30,47 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             loginBut = new Button();
-            idBox = new TextBox();
+            statusStrip1 = new StatusStrip();
+            toolStripStatusLabel = new ToolStripStatusLabel();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // loginBut
             // 
-            loginBut.Location = new Point(262, 12);
+            loginBut.Location = new Point(113, 3);
             loginBut.Name = "loginBut";
-            loginBut.Size = new Size(75, 23);
+            loginBut.Size = new Size(117, 34);
             loginBut.TabIndex = 0;
             loginBut.Text = "Login";
             loginBut.UseVisualStyleBackColor = true;
             loginBut.Click += loginBut_Click;
             // 
-            // idBox
+            // statusStrip1
             // 
-            idBox.Location = new Point(12, 12);
-            idBox.Name = "idBox";
-            idBox.Size = new Size(244, 23);
-            idBox.TabIndex = 1;
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel });
+            statusStrip1.Location = new Point(0, 142);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(349, 22);
+            statusStrip1.TabIndex = 1;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel
+            // 
+            toolStripStatusLabel.Name = "toolStripStatusLabel";
+            toolStripStatusLabel.Size = new Size(0, 17);
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(349, 164);
-            Controls.Add(idBox);
+            Controls.Add(statusStrip1);
             Controls.Add(loginBut);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "MainForm";
             Text = "SciChain";
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -67,6 +78,7 @@
         #endregion
 
         private Button loginBut;
-        private TextBox idBox;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel toolStripStatusLabel;
     }
 }
