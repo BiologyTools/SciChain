@@ -32,11 +32,12 @@ namespace SciChain
             public decimal Amount { get; set; }
             public string Signature { get; set; }
             public Type TransactionType { get; set; }
-            public Transaction(Type t, string fromAddress, string toAddress, decimal amount)
+            public Transaction(Type t, string fromAddress, RSAParameters par, string toAddress, decimal amount)
             {
                 FromAddress = fromAddress;
                 ToAddress = toAddress;
                 Amount = amount;
+                PublicKey = RSA.RSAParametersToString(par);
             }
             public void SignTransaction(RSAParameters privateKey, string fromAddress)
             {
@@ -56,6 +57,18 @@ namespace SciChain
         public string PreviousHash { get; set; } // The hash of the previous block
         public IList<Transaction> Transactions { get; set; }
         public string Hash { get; set; } // The block's hash
+        public Document BlockDocument { get; set; }
+        public class Document
+        {
+            public string DOI { get; set; }
+            public IList<string> Publishers { get; set; }
+            public Document(string dOI, IList<string> publishers)
+            {
+                DOI = dOI;
+                Publishers = publishers;
+            }
+        }
+
 
         public Block(DateTime timeStamp, string previousHash, IList<Transaction> transactions)
         {
@@ -130,6 +143,7 @@ namespace SciChain
 
             foreach (var block in Chain)
             {
+                if(block.Transactions!=null)
                 foreach (var trans in block.Transactions)
                 {
                     if (trans.FromAddress == address)
@@ -183,7 +197,6 @@ namespace SciChain
             {
                 //We will register this user and associate their ORCID ID with their public key (RSAParameters) 
                 //If this is a new user we will send them the gift transaction from the treasury.
-
             }
             PendingTransactions.Add(transaction);
             return true;
@@ -340,7 +353,7 @@ namespace SciChain
 
         #endregion
 
-        public void MineBlock(string minerAddress)
+        public void MineBlock(string minerAddress,Document doc,RSAParameters par)
         {
             List<Transaction> transactions = new List<Transaction>();
             foreach (var transaction in PendingTransactions)
@@ -349,10 +362,11 @@ namespace SciChain
                     transactions.Add(transaction);
             }
             var block = new Block(DateTime.Now, GetLatestBlock().Hash, transactions);
+            block.BlockDocument = doc;
             AddBlock(block);
             // Reset the pending transactions and send mining reward
             PendingTransactions = new List<Transaction>();
-            ProcessTransaction(new Transaction(Transaction.Type.blockreward,null, minerAddress, miningReward));
+            ProcessTransaction(new Transaction(Transaction.Type.blockreward,null,par, minerAddress, miningReward));
             if(currentSupply < totalSupply)
             currentSupply += miningReward;
         }
@@ -369,6 +383,91 @@ namespace SciChain
                     PublicKey = rsa.ExportParameters(false); // Export the public key
                     PrivateKey = rsa.ExportParameters(true); // Export the private key
                 }
+            }
+            private static void EncryptAndSaveKeys(string publicKey, string privateKey, string password, string filePath)
+            {
+                // Generate a random salt
+                byte[] salt = new byte[16];
+                using (var rng = RandomNumberGenerator.Create())
+                {
+                    rng.GetBytes(salt);
+                }
+
+                // Derive a key and IV from the password and salt
+                var key = new Rfc2898DeriveBytes(password, salt, 10000);
+
+                using (Aes aes = Aes.Create())
+                {
+                    aes.Key = key.GetBytes(aes.KeySize / 8);
+                    aes.IV = key.GetBytes(aes.BlockSize / 8);
+
+                    // Create an encryptor to perform the stream transform
+                    ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+                    // Create the streams used for encryption
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        // First write the salt
+                        fileStream.Write(salt, 0, salt.Length);
+
+                        using (var cryptoStream = new CryptoStream(fileStream, encryptor, CryptoStreamMode.Write))
+                        {
+                            using (var streamWriter = new StreamWriter(cryptoStream))
+                            {
+                                // Write the public and private keys to the stream
+                                streamWriter.WriteLine(publicKey);
+                                streamWriter.WriteLine(privateKey);
+                            }
+                        }
+                    }
+                }
+            }
+            public void Save(string password)
+            {
+                string path = Path.GetDirectoryName(Environment.ProcessPath);
+                EncryptAndSaveKeys(RSA.RSAParametersToString(PublicKey), RSA.RSAParametersToString(PrivateKey), password,path + "/wallet.dat");
+            }
+            public static void ReadAndDecryptKeys(string password, string filePath, out string publicKey, out string privateKey)
+            {
+                byte[] salt = new byte[16];
+
+                using (var fileStream = new FileStream(filePath, FileMode.Open))
+                {
+                    // First read the salt
+                    fileStream.Read(salt, 0, salt.Length);
+
+                    // Derive a key and IV from the password and salt
+                    var key = new Rfc2898DeriveBytes(password, salt, 10000);
+
+                    using (Aes aes = Aes.Create())
+                    {
+                        aes.Key = key.GetBytes(aes.KeySize / 8);
+                        aes.IV = key.GetBytes(aes.BlockSize / 8);
+
+                        // Create a decryptor to perform the stream transform
+                        ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+
+                        using (var cryptoStream = new CryptoStream(fileStream, decryptor, CryptoStreamMode.Read))
+                        {
+                            using (var streamReader = new StreamReader(cryptoStream))
+                            {
+                                // Read the decrypted public and private keys from the stream
+                                publicKey = streamReader.ReadLine();
+                                privateKey = streamReader.ReadLine();
+                            }
+                        }
+                    }
+                }
+            }
+            public void Load(string password)
+            {
+                string path = Path.GetDirectoryName(Environment.ProcessPath);
+                string pub, priv;
+                if (!File.Exists(path + "/wallet.dat"))
+                    return;
+                ReadAndDecryptKeys(password,path + "/wallet.dat",out pub,out priv);
+                PublicKey = RSA.StringToRSAParametersAll(pub);
+                PrivateKey = RSA.StringToRSAParametersAll(priv);
             }
         }
 
@@ -455,9 +554,43 @@ namespace SciChain
                 //D = paramsFromJson.D != null ? Convert.FromBase64String(paramsFromJson.D.ToString()) : null
             };
         }
+        public static string RSAParametersToStringAll(RSAParameters parameters)
+        {
+            // RSAParameters contains fields that are byte arrays and cannot be directly serialized by JsonConvert,
+            // so we create a serializable object to hold the data.
+            var paramsToSerialize = new
+            {
+                Modulus = parameters.Modulus != null ? Convert.ToBase64String(parameters.Modulus) : null,
+                Exponent = parameters.Exponent != null ? Convert.ToBase64String(parameters.Exponent) : null,
+                P = parameters.P != null ? Convert.ToBase64String(parameters.P) : null,
+                Q = parameters.Q != null ? Convert.ToBase64String(parameters.Q) : null,
+                DP = parameters.DP != null ? Convert.ToBase64String(parameters.DP) : null,
+                DQ = parameters.DQ != null ? Convert.ToBase64String(parameters.DQ) : null,
+                InverseQ = parameters.InverseQ != null ? Convert.ToBase64String(parameters.InverseQ) : null,
+                D = parameters.D != null ? Convert.ToBase64String(parameters.D) : null
+            };
+
+            return JsonConvert.SerializeObject(paramsToSerialize);
+        }
+        public static RSAParameters StringToRSAParametersAll(string jsonString)
+        {
+            var paramsFromJson = JsonConvert.DeserializeObject<dynamic>(jsonString);
+
+            return new RSAParameters
+            {
+                Modulus = paramsFromJson.Modulus != null ? Convert.FromBase64String(paramsFromJson.Modulus.ToString()) : null,
+                Exponent = paramsFromJson.Exponent != null ? Convert.FromBase64String(paramsFromJson.Exponent.ToString()) : null,
+                P = paramsFromJson.P != null ? Convert.FromBase64String(paramsFromJson.P.ToString()) : null,
+                Q = paramsFromJson.Q != null ? Convert.FromBase64String(paramsFromJson.Q.ToString()) : null,
+                DP = paramsFromJson.DP != null ? Convert.FromBase64String(paramsFromJson.DP.ToString()) : null,
+                DQ = paramsFromJson.DQ != null ? Convert.FromBase64String(paramsFromJson.DQ.ToString()) : null,
+                InverseQ = paramsFromJson.InverseQ != null ? Convert.FromBase64String(paramsFromJson.InverseQ.ToString()) : null,
+                D = paramsFromJson.D != null ? Convert.FromBase64String(paramsFromJson.D.ToString()) : null
+            };
+        }
     }
 
-    public static class OrcidAuthentication
+    public static class Orcid
     {
         private static readonly string clientId = "APP-PCZPI3V579SL36TV";
         private static readonly string clientSecret = "6d00747a-ae0f-4567-bade-5bfa359bc75a";
@@ -508,6 +641,54 @@ namespace SciChain
             public string ORCID { get; set; }
             // Include other fields as necessary
         }
+
+        public static async Task<string> SearchForORCID(string name)
+        {
+            var searchEndpoint = "https://pub.orcid.org/v3.0/search/";
+            var query = $"q={Uri.EscapeDataString(name)}";
+            var requestUri = $"{searchEndpoint}?{query}";
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+
+                var response = await httpClient.GetAsync(requestUri);
+                response.EnsureSuccessStatusCode();
+
+                var responseString = await response.Content.ReadAsStringAsync();
+                var responseObject = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+                // Extract ORCID iD from the response
+                var orcidId = responseObject["result"][0]["orcid-identifier"]["path"];
+
+                return orcidId;
+            }
+        }
+        public static async Task<bool> CheckORCIDExistence(string orcid)
+        {
+            var orcidEndpoint = $"https://pub.orcid.org/v3.0/{orcid}/record";
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+
+                var response = await httpClient.GetAsync(orcidEndpoint);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseData = await response.Content.ReadAsStringAsync();
+                    dynamic responseObject = JsonConvert.DeserializeObject(responseData);
+
+                    // Check if the response contains a valid ORCID record
+                    return responseObject != null && responseObject["error"] == null;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
     }
     public static class OAuthHelper
     {
