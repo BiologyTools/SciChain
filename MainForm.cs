@@ -26,12 +26,14 @@ namespace SciChain
             token = OAuthHelper.StartListenerAsync().Result;
             ORCID = await Orcid.GetAccessToken(token);
             toolStripStatusLabel.Text = "Logged In:" + ORCID.Name + " " + ORCID.ORCID;
-            balanceLabel.Text = chain.GetBalance(ORCID.ORCID).ToString();
+            balanceLabel.Text = "Balance: " + chain.GetBalance(ORCID.ORCID).ToString();
             sendBut.Enabled = true;
             addByIDBut.Enabled = true;
             addByNameBut.Enabled = true;
             createBut.Enabled = true;
-            wallet.Load(maskedTextBox.Text);    
+            updateBut.Enabled = true;
+            getAddrBut.Enabled = true;
+            wallet.Load(maskedTextBox.Text);
         }
 
         private void createBut_Click(object sender, EventArgs e)
@@ -41,8 +43,8 @@ namespace SciChain
             {
                 list.Add(item.ToString());
             }
-            Block.Document doc = new Block.Document(doiBox.Text,list);
-            chain.MineBlock(ORCID.ORCID, doc,wallet.PublicKey);
+            Block.Document doc = new Block.Document(doiBox.Text, list);
+            chain.MineBlock(ORCID.ORCID, doc, wallet.PublicKey);
         }
 
         private void sendBut_Click(object sender, EventArgs e)
@@ -66,8 +68,18 @@ namespace SciChain
         private async void addByIDBut_Click(object sender, EventArgs e)
         {
             bool id = await Orcid.CheckORCIDExistence(idBox.Text);
-            if(id)
+            if (id)
                 authorsBox.Items.Add(id);
+        }
+
+        private void updateBut_Click(object sender, EventArgs e)
+        {
+            balanceLabel.Text = "Balance: " + chain.GetBalance(ORCID.ORCID).ToString();
+        }
+
+        private async void getAddrBut_Click(object sender, EventArgs e)
+        {
+            addrBox.Text = await Orcid.SearchForORCID(sendToNameBox.Text);
         }
     }
 }

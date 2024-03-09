@@ -51,6 +51,10 @@
             label5 = new Label();
             maskedTextBox = new MaskedTextBox();
             label6 = new Label();
+            updateBut = new Button();
+            label7 = new Label();
+            sendToNameBox = new TextBox();
+            getAddrBut = new Button();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)amountBox).BeginInit();
             SuspendLayout();
@@ -109,7 +113,7 @@
             // createBut
             // 
             createBut.Enabled = false;
-            createBut.Location = new Point(402, 181);
+            createBut.Location = new Point(402, 211);
             createBut.Name = "createBut";
             createBut.Size = new Size(81, 23);
             createBut.TabIndex = 5;
@@ -135,7 +139,7 @@
             // 
             // doiBox
             // 
-            doiBox.Location = new Point(77, 66);
+            doiBox.Location = new Point(77, 96);
             doiBox.Name = "doiBox";
             doiBox.Size = new Size(406, 23);
             doiBox.TabIndex = 10;
@@ -143,7 +147,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(11, 69);
+            label2.Location = new Point(11, 99);
             label2.Name = "label2";
             label2.Size = new Size(30, 15);
             label2.TabIndex = 11;
@@ -152,7 +156,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(12, 97);
+            label3.Location = new Point(12, 127);
             label3.Name = "label3";
             label3.Size = new Size(52, 15);
             label3.TabIndex = 12;
@@ -161,7 +165,7 @@
             // authorsBox
             // 
             authorsBox.FormattingEnabled = true;
-            authorsBox.Location = new Point(77, 94);
+            authorsBox.Location = new Point(77, 124);
             authorsBox.Name = "authorsBox";
             authorsBox.Size = new Size(406, 23);
             authorsBox.TabIndex = 13;
@@ -169,7 +173,7 @@
             // addByNameBut
             // 
             addByNameBut.Enabled = false;
-            addByNameBut.Location = new Point(351, 122);
+            addByNameBut.Location = new Point(351, 152);
             addByNameBut.Name = "addByNameBut";
             addByNameBut.Size = new Size(132, 23);
             addByNameBut.TabIndex = 14;
@@ -179,14 +183,14 @@
             // 
             // nameBox
             // 
-            nameBox.Location = new Point(77, 123);
+            nameBox.Location = new Point(77, 153);
             nameBox.Name = "nameBox";
             nameBox.Size = new Size(268, 23);
             nameBox.TabIndex = 15;
             // 
             // idBox
             // 
-            idBox.Location = new Point(77, 152);
+            idBox.Location = new Point(77, 182);
             idBox.Name = "idBox";
             idBox.Size = new Size(268, 23);
             idBox.TabIndex = 16;
@@ -194,7 +198,7 @@
             // addByIDBut
             // 
             addByIDBut.Enabled = false;
-            addByIDBut.Location = new Point(351, 152);
+            addByIDBut.Location = new Point(351, 182);
             addByIDBut.Name = "addByIDBut";
             addByIDBut.Size = new Size(132, 23);
             addByIDBut.TabIndex = 17;
@@ -205,7 +209,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(12, 126);
+            label4.Location = new Point(12, 156);
             label4.Name = "label4";
             label4.Size = new Size(42, 15);
             label4.TabIndex = 18;
@@ -214,7 +218,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(12, 155);
+            label5.Location = new Point(12, 185);
             label5.Name = "label5";
             label5.Size = new Size(59, 15);
             label5.TabIndex = 19;
@@ -237,11 +241,53 @@
             label6.TabIndex = 21;
             label6.Text = "Wallet Password";
             // 
+            // updateBut
+            // 
+            updateBut.Enabled = false;
+            updateBut.Location = new Point(402, 8);
+            updateBut.Name = "updateBut";
+            updateBut.Size = new Size(81, 23);
+            updateBut.TabIndex = 22;
+            updateBut.Text = "Update";
+            updateBut.UseVisualStyleBackColor = true;
+            updateBut.Click += updateBut_Click;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(12, 70);
+            label7.Name = "label7";
+            label7.Size = new Size(42, 15);
+            label7.TabIndex = 23;
+            label7.Text = "Name:";
+            // 
+            // sendToNameBox
+            // 
+            sendToNameBox.Location = new Point(77, 66);
+            sendToNameBox.Name = "sendToNameBox";
+            sendToNameBox.Size = new Size(232, 23);
+            sendToNameBox.TabIndex = 24;
+            // 
+            // getAddrBut
+            // 
+            getAddrBut.Enabled = false;
+            getAddrBut.Location = new Point(315, 66);
+            getAddrBut.Name = "getAddrBut";
+            getAddrBut.Size = new Size(81, 23);
+            getAddrBut.TabIndex = 25;
+            getAddrBut.Text = "Get Address";
+            getAddrBut.UseVisualStyleBackColor = true;
+            getAddrBut.Click += getAddrBut_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(489, 361);
+            Controls.Add(getAddrBut);
+            Controls.Add(sendToNameBox);
+            Controls.Add(label7);
+            Controls.Add(updateBut);
             Controls.Add(label6);
             Controls.Add(maskedTextBox);
             Controls.Add(label5);
@@ -298,5 +344,9 @@
         private Label label5;
         private MaskedTextBox maskedTextBox;
         private Label label6;
+        private Button updateBut;
+        private Label label7;
+        private TextBox sendToNameBox;
+        private Button getAddrBut;
     }
 }

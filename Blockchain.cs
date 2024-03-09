@@ -107,7 +107,6 @@ namespace SciChain
         public Blockchain()
         {
             InitializeChain();
-            AddGenesisBlock();
         }
         string dir = System.IO.Path.GetDirectoryName(Environment.ProcessPath);
         public List<Peer> Peers { set; get; } = new List<Peer>();
@@ -203,6 +202,8 @@ namespace SciChain
         }
         public bool VerifyTransaction(Transaction transaction)
         {
+            if (transaction.TransactionType != Transaction.Type.blockreward)
+                return true;
             using (var rsa = new RSACryptoServiceProvider())
             {
                 try
