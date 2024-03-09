@@ -4,32 +4,29 @@ namespace SciChain
 {
     public partial class MainForm : Form
     {
-        private string token;
+        private Blockchain chain;
+        private OAuthTokenResponse ORCID;
+        string token;
         public MainForm()
         {
             InitializeComponent();
-            /*
-            Blockchain scichain = new Blockchain();
-            scichain.AddBlock(new Block(DateTime.Now, scichain.GetLatestBlock().Hash, "Block 1 Data"));
-            scichain.AddBlock(new Block(DateTime.Now, scichain.GetLatestBlock().Hash, "Block 2 Data"));
+            chain = new Blockchain();
+            chain.Load();
+            if (chain.Chain.Count == 0)
+                chain.AddGenesisBlock();
 
-            Console.WriteLine("Is blockchain valid? " + scichain.IsValid());
-
-            foreach (Block block in scichain.Chain)
-            {
-                Console.WriteLine($"Index: {block.Index}");
-                Console.WriteLine($"Previous Hash: {block.PreviousHash}");
-                Console.WriteLine($"Hash: {block.Hash}");
-                Console.WriteLine($"Data: {block.Data}");
-                Console.WriteLine();
-            }
-            */
         }
 
-        private void loginBut_Click(object sender, EventArgs e)
+        private async void loginBut_Click(object sender, EventArgs e)
         {
             token = OAuthHelper.StartListenerAsync().Result;
-            toolStripStatusLabel.Text = "Logged In:" + token;
+            ORCID = await OrcidAuthentication.GetAccessToken(token);
+            toolStripStatusLabel.Text = "Logged In:" + ORCID.Name + " " + ORCID.ORCID;
+        }
+
+        private void createBut_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

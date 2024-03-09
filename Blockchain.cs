@@ -13,18 +13,26 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using static SciChain.Block;
+using System.Net.Sockets;
 namespace SciChain
 {
     public class Block
     {
         public class Transaction
         {
+            public enum Type
+            {
+                transaction,
+                blockreward,
+                registration,
+            }
             public string FromAddress { get; set; }
             public string ToAddress { get; set; }
             public string PublicKey { get; set; }
             public decimal Amount { get; set; }
             public string Signature { get; set; }
-            public Transaction(string fromAddress, string toAddress, decimal amount)
+            public Type TransactionType { get; set; }
+            public Transaction(Type t, string fromAddress, string toAddress, decimal amount)
             {
                 FromAddress = fromAddress;
                 ToAddress = toAddress;
@@ -73,15 +81,24 @@ namespace SciChain
         public int currentHeight = 0;
         public List<Transaction> PendingTransactions = new List<Transaction>();
         public IList<Block> Chain { set; get; }
-        public decimal totalSupply = 100000000;
+        //Total supply is calculated to be one coin per person.
+        public const decimal totalSupply = 9900000000 + treasury;
+        public const decimal treasury = 100000000;
+        //We will use 10 billion people as our population
+        public const long population = 10000000000;
+        //With the treasury we can give each user 0.01 coins.
+        public const decimal gift = 0.01M;
         public decimal currentSupply = 0;
         public const decimal miningReward = 10;
+        public const int port = 1234;
         public Blockchain()
         {
             InitializeChain();
             AddGenesisBlock();
         }
         string dir = System.IO.Path.GetDirectoryName(Environment.ProcessPath);
+        public List<Peer> Peers { set; get; } = new List<Peer>();
+
         private void InitializeChain()
         {
             Settings.Load();
@@ -92,7 +109,7 @@ namespace SciChain
             Directory.CreateDirectory(dir + "/Blocks");
         }
 
-        private void AddGenesisBlock()
+        public void AddGenesisBlock()
         {
             Chain.Add(CreateGenesisBlock());
         }
@@ -137,27 +154,37 @@ namespace SciChain
             block.PreviousHash = latestBlock.Hash;
             block.Hash = block.CalculateHash();
             Chain.Add(block);
+            BroadcastNewBlock(block);
         }
 
-        public bool CreateTransaction(Transaction transaction)
+        public bool ProcessTransaction(Transaction transaction)
         {
             if (!VerifyTransaction(transaction))
             {
                 Console.WriteLine("Transaction failed: Not a valid transaction.");
                 return false;
             }
-            // Proceed with adding the transaction
-            if (transaction.FromAddress != null)
-            {
-                var senderBalance = GetBalance(transaction.FromAddress);
 
-                if (senderBalance < transaction.Amount)
+            if (transaction.TransactionType == Transaction.Type.transaction)
+            {
+                // Proceed with adding the transaction
+                if (transaction.FromAddress != null)
                 {
-                    Console.WriteLine("Transaction failed: Not enough balance.");
-                    return false;
+                    var senderBalance = GetBalance(transaction.FromAddress);
+
+                    if (senderBalance < transaction.Amount)
+                    {
+                        Console.WriteLine("Transaction failed: Not enough balance.");
+                        return false;
+                    }
                 }
             }
+            else if (transaction.TransactionType == Transaction.Type.registration)
+            {
+                //We will register this user and associate their ORCID ID with their public key (RSAParameters) 
+                //If this is a new user we will send them the gift transaction from the treasury.
 
+            }
             PendingTransactions.Add(transaction);
             return true;
         }
@@ -180,6 +207,139 @@ namespace SciChain
                 }
             }
         }
+
+        #region Server
+        public class Peer
+        {
+            public TcpClient Client { get; set; }
+            public string Address { get; set; }
+            public int Port { get; set; }
+
+            public Peer(TcpClient client, string address, int port)
+            {
+                Client = client;
+                Address = address;
+                Port = port;
+            }
+        }
+        public class Node
+        {
+            public string Address { get; set; } // Could be IP address, domain name, etc.
+            public int Port { get; set; }
+
+            // Additional node-specific information (e.g., public key)
+        }
+
+        public class Message
+        {
+            public string Type { get; set; } // E.g., "NewBlock", "NewTransaction", etc.
+            public string Content { get; set; } // The actual message content, likely serialized data
+        }
+
+        public void StartServer()
+        {
+            TcpListener server = new TcpListener(IPAddress.Any, port);
+
+            server.Start();
+            Console.WriteLine("Server has started on 127.0.0.1:" + port + ".");
+
+            while (true)
+            {
+                TcpClient client = server.AcceptTcpClient();
+
+                // Handle the client in a new thread
+                Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClient));
+                clientThread.Start(client);
+            }
+        }
+
+        public void HandleClient(object clientObj)
+        {
+            var client = clientObj as TcpClient;
+            if (client == null) return;
+
+            try
+            {
+                var stream = client.GetStream();
+                var reader = new StreamReader(stream, Encoding.UTF8);
+
+                // Continuously listen for messages
+                while (true)
+                {
+                    var messageString = reader.ReadLine();
+                    if (messageString == null) break; // Client has disconnected
+
+                    // Deserialize the message
+                    var message = JsonConvert.DeserializeObject<Message>(messageString);
+                    if (message == null) continue;
+
+                    // Process the message based on its type
+                    ProcessMessage(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                // Handle error (e.g., logging, cleanup, etc.)
+            }
+            finally
+            {
+                client.Close();
+            }
+        }
+
+        private void ProcessMessage(Message message)
+        {
+            // Implement message processing logic here
+            // For example, handling "NewBlock" messages:
+            if (message.Type == "NewBlock")
+            {
+                var block = JsonConvert.DeserializeObject<Block>(message.Content);
+                AddBlock(block);
+            }
+            // Handle other message types as necessary
+        }
+
+        public void ConnectToPeer(string address)
+        {
+            try
+            {
+                TcpClient client = new TcpClient(address, port);
+                Peers.Add(new Peer(client, address, port));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error connecting to peer: " + e.Message);
+            }
+        }
+        public void BroadcastNewBlock(Block block)
+        {
+            var message = new Message
+            {
+                Type = "NewBlock",
+                Content = JsonConvert.SerializeObject(block)
+            };
+
+            var messageString = JsonConvert.SerializeObject(message);
+            byte[] messageBytes = Encoding.ASCII.GetBytes(messageString);
+
+            foreach (var peer in Peers)
+            {
+                try
+                {
+                    NetworkStream stream = peer.Client.GetStream();
+                    stream.Write(messageBytes, 0, messageBytes.Length);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error sending message to peer {peer.Address}:{peer.Port} - {e.Message}");
+                    // Handle error (e.g., remove peer from list)
+                }
+            }
+        }
+
+        #endregion
+
         public void MineBlock(string minerAddress)
         {
             List<Transaction> transactions = new List<Transaction>();
@@ -189,10 +349,10 @@ namespace SciChain
                     transactions.Add(transaction);
             }
             var block = new Block(DateTime.Now, GetLatestBlock().Hash, transactions);
-            Chain.Add(block);
+            AddBlock(block);
             // Reset the pending transactions and send mining reward
             PendingTransactions = new List<Transaction>();
-            CreateTransaction(new Transaction(null, minerAddress, miningReward));
+            ProcessTransaction(new Transaction(Transaction.Type.blockreward,null, minerAddress, miningReward));
             if(currentSupply < totalSupply)
             currentSupply += miningReward;
         }
@@ -241,16 +401,16 @@ namespace SciChain
                 string f = dir + "/Blocks/" + block.Index + ".json";
                 if(!File.Exists(f))
                 {
-                    File.WriteAllText(f, JsonConvert.SerializeObject(block, Formatting.Indented));
+                    File.WriteAllText(f, JsonConvert.SerializeObject(block));
                 }
             }
         }
 
-        public void Load(string fileName)
+        public void Load()
         {
             foreach (var f in Directory.GetFiles(dir + "/Blocks/"))
             {
-                var json = File.ReadAllText(fileName);
+                var json = File.ReadAllText(f);
                 Block b = JsonConvert.DeserializeObject<Block>(json);
                 Chain.Add(b);
             }
@@ -302,16 +462,18 @@ namespace SciChain
         private static readonly string clientId = "APP-PCZPI3V579SL36TV";
         private static readonly string clientSecret = "6d00747a-ae0f-4567-bade-5bfa359bc75a";
         private static readonly HttpClient httpClient = new HttpClient();
-        public static async Task<string> GetAccessToken(string authorizationCode)
+        public static async Task<OAuthTokenResponse> GetAccessToken(string authorizationCode)
         {
+            var httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri("https://orcid.org/");
             var tokenEndpoint = "https://orcid.org/oauth/token";
             var postData = new Dictionary<string, string>
             {
                 { "client_id", clientId },
                 { "client_secret", clientSecret },
                 { "grant_type", "authorization_code" },
-                { "code", authorizationCode },
-                { "redirect_uri", "http://127.0.0.1:8000/" } // The redirect URI registered with ORCID
+                { "redirect_uri", "http://127.0.0.1:8000" },
+                { "code", authorizationCode }
             };
 
             var content = new FormUrlEncodedContent(postData);
@@ -321,7 +483,7 @@ namespace SciChain
             if (response.IsSuccessStatusCode)
             {
                 var tokenResponse = JsonConvert.DeserializeObject<OAuthTokenResponse>(responseString);
-                return tokenResponse.AccessToken; // This is the access token you'll use in subsequent requests
+                return tokenResponse; // This is the access token you'll use in subsequent requests
             }
 
             throw new Exception("Failed to obtain access token.");
@@ -332,6 +494,18 @@ namespace SciChain
         {
             [JsonProperty("access_token")]
             public string AccessToken { get; set; }
+            [JsonProperty("bearer")]
+            public string Bearer { get; set; }
+            [JsonProperty("refresh_token")]
+            public string RefreshToken { get; set; }
+            [JsonProperty("expires_in")]
+            public string Expiry { get; set; }
+            [JsonProperty("scope")]
+            public string Scope { get; set; }
+            [JsonProperty("name")]
+            public string Name { get; set; }
+            [JsonProperty("orcid")]
+            public string ORCID { get; set; }
             // Include other fields as necessary
         }
     }
