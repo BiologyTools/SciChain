@@ -1,32 +1,29 @@
-using Newtonsoft.Json;
-using System.Security.Cryptography;
-using System.Text;
 using static SciChain.Orcid;
-
+using static SciChain.Blockchain;
+using NetCoreServer;
 namespace SciChain
 {
     public partial class MainForm : Form
     {
-        private Blockchain chain;
         private Blockchain.Wallet wallet;
         private OAuthTokenResponse ORCID;
         string token;
+        public string peer = "92.205.238.105";
         public MainForm()
         {
             InitializeComponent();
-            chain = new Blockchain();
-            chain.Load();
-            if (chain.Chain.Count == 0)
-                chain.AddGenesisBlock();
+            Initialize(false);
+            ConnectToPeer(peer,new ChatClient(peer, 8333),8333);
+            Blockchain.Load();
             wallet = new Blockchain.Wallet();
+            timer.Start();
         }
-
         private async void loginBut_Click(object sender, EventArgs e)
         {
             token = OAuthHelper.StartListenerAsync().Result;
             ORCID = await Orcid.GetAccessToken(token);
             toolStripStatusLabel.Text = "Logged In:" + ORCID.Name + " " + ORCID.ORCID;
-            balanceLabel.Text = "Balance: " + chain.GetBalance(ORCID.ORCID).ToString();
+            balanceLabel.Text = "Balance: " + GetBalance(ORCID.ORCID).ToString();
             sendBut.Enabled = true;
             addByIDBut.Enabled = true;
             addByNameBut.Enabled = true;
@@ -34,6 +31,8 @@ namespace SciChain
             updateBut.Enabled = true;
             getAddrBut.Enabled = true;
             wallet.Load(maskedTextBox.Text);
+            ProcessTransaction(new Block.Transaction(Block.Transaction.Type.registration, null, wallet.PublicKey, ORCID.ORCID, Blockchain.gift));
+            
         }
 
         private void createBut_Click(object sender, EventArgs e)
@@ -44,17 +43,17 @@ namespace SciChain
                 list.Add(item.ToString());
             }
             Block.Document doc = new Block.Document(doiBox.Text, list);
-            chain.MineBlock(ORCID.ORCID, doc, wallet.PublicKey);
+            MineBlock(ORCID.ORCID, doc, wallet.PublicKey);
         }
 
         private void sendBut_Click(object sender, EventArgs e)
         {
-            chain.ProcessTransaction(new Block.Transaction(Block.Transaction.Type.transaction, ORCID.ORCID, wallet.PublicKey, addrBox.Text, amountBox.Value));
+            ProcessTransaction(new Block.Transaction(Block.Transaction.Type.transaction, ORCID.ORCID, wallet.PublicKey, addrBox.Text, amountBox.Value));
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            chain.Save();
+            Save();
             wallet.Save(maskedTextBox.Text);
         }
 
@@ -74,12 +73,17 @@ namespace SciChain
 
         private void updateBut_Click(object sender, EventArgs e)
         {
-            balanceLabel.Text = "Balance: " + chain.GetBalance(ORCID.ORCID).ToString();
+            balanceLabel.Text = "Balance: " + GetBalance(ORCID.ORCID).ToString();
         }
 
         private async void getAddrBut_Click(object sender, EventArgs e)
         {
             addrBox.Text = await Orcid.SearchForORCID(sendToNameBox.Text);
+        }
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            toolStripStatusLabel2.Text = "Connections:" + Peers.Count.ToString() + " Height: " + Chain.Count;
         }
     }
 }

@@ -28,10 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             loginBut = new Button();
-            statusStrip1 = new StatusStrip();
+            statusStrip = new StatusStrip();
             toolStripStatusLabel = new ToolStripStatusLabel();
+            toolStripStatusLabel2 = new ToolStripStatusLabel();
             balanceLabel = new Label();
             addrBox = new TextBox();
             sendBut = new Button();
@@ -55,7 +57,8 @@
             label7 = new Label();
             sendToNameBox = new TextBox();
             getAddrBut = new Button();
-            statusStrip1.SuspendLayout();
+            timer = new System.Windows.Forms.Timer(components);
+            statusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)amountBox).BeginInit();
             SuspendLayout();
             // 
@@ -69,19 +72,24 @@
             loginBut.UseVisualStyleBackColor = true;
             loginBut.Click += loginBut_Click;
             // 
-            // statusStrip1
+            // statusStrip
             // 
-            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel });
-            statusStrip1.Location = new Point(0, 339);
-            statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(489, 22);
-            statusStrip1.TabIndex = 1;
-            statusStrip1.Text = "statusStrip1";
+            statusStrip.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel, toolStripStatusLabel2 });
+            statusStrip.Location = new Point(0, 339);
+            statusStrip.Name = "statusStrip";
+            statusStrip.Size = new Size(489, 22);
+            statusStrip.TabIndex = 1;
+            statusStrip.Text = "statusStrip1";
             // 
             // toolStripStatusLabel
             // 
             toolStripStatusLabel.Name = "toolStripStatusLabel";
             toolStripStatusLabel.Size = new Size(0, 17);
+            // 
+            // toolStripStatusLabel2
+            // 
+            toolStripStatusLabel2.Name = "toolStripStatusLabel2";
+            toolStripStatusLabel2.Size = new Size(0, 17);
             // 
             // balanceLabel
             // 
@@ -279,8 +287,14 @@
             getAddrBut.UseVisualStyleBackColor = true;
             getAddrBut.Click += getAddrBut_Click;
             // 
+            // timer
+            // 
+            timer.Interval = 1000;
+            timer.Tick += timer_Tick;
+            // 
             // MainForm
             // 
+            AcceptButton = loginBut;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(489, 361);
@@ -306,15 +320,15 @@
             Controls.Add(sendBut);
             Controls.Add(addrBox);
             Controls.Add(balanceLabel);
-            Controls.Add(statusStrip1);
+            Controls.Add(statusStrip);
             Controls.Add(loginBut);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "MainForm";
             SizeGripStyle = SizeGripStyle.Hide;
             Text = "SciChain";
             FormClosing += MainForm_FormClosing;
-            statusStrip1.ResumeLayout(false);
-            statusStrip1.PerformLayout();
+            statusStrip.ResumeLayout(false);
+            statusStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)amountBox).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -323,7 +337,7 @@
         #endregion
 
         private Button loginBut;
-        private StatusStrip statusStrip1;
+        private StatusStrip statusStrip;
         private ToolStripStatusLabel toolStripStatusLabel;
         private Label balanceLabel;
         private TextBox addrBox;
@@ -348,5 +362,7 @@
         private Label label7;
         private TextBox sendToNameBox;
         private Button getAddrBut;
+        private ToolStripStatusLabel toolStripStatusLabel2;
+        private System.Windows.Forms.Timer timer;
     }
 }
