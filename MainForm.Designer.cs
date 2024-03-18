@@ -58,13 +58,21 @@
             sendToNameBox = new TextBox();
             getAddrBut = new Button();
             timer = new System.Windows.Forms.Timer(components);
+            label8 = new Label();
+            peerReviewBox = new TextBox();
+            peerReviewBut = new Button();
+            flagBut = new Button();
+            reputationLabel = new Label();
+            pendingBox = new ComboBox();
+            label10 = new Label();
+            textBox1 = new TextBox();
             statusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)amountBox).BeginInit();
             SuspendLayout();
             // 
             // loginBut
             // 
-            loginBut.Location = new Point(366, 309);
+            loginBut.Location = new Point(366, 337);
             loginBut.Name = "loginBut";
             loginBut.Size = new Size(117, 23);
             loginBut.TabIndex = 0;
@@ -75,9 +83,9 @@
             // statusStrip
             // 
             statusStrip.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel, toolStripStatusLabel2 });
-            statusStrip.Location = new Point(0, 339);
+            statusStrip.Location = new Point(0, 388);
             statusStrip.Name = "statusStrip";
-            statusStrip.Size = new Size(489, 22);
+            statusStrip.Size = new Size(828, 22);
             statusStrip.TabIndex = 1;
             statusStrip.Text = "statusStrip1";
             // 
@@ -85,6 +93,7 @@
             // 
             toolStripStatusLabel.Name = "toolStripStatusLabel";
             toolStripStatusLabel.Size = new Size(0, 17);
+            toolStripStatusLabel.Click += toolStripStatusLabel_Click;
             // 
             // toolStripStatusLabel2
             // 
@@ -121,9 +130,9 @@
             // createBut
             // 
             createBut.Enabled = false;
-            createBut.Location = new Point(402, 211);
+            createBut.Location = new Point(351, 211);
             createBut.Name = "createBut";
-            createBut.Size = new Size(81, 23);
+            createBut.Size = new Size(132, 23);
             createBut.TabIndex = 5;
             createBut.Text = "Create Block";
             createBut.UseVisualStyleBackColor = true;
@@ -234,7 +243,7 @@
             // 
             // maskedTextBox
             // 
-            maskedTextBox.Location = new Point(111, 309);
+            maskedTextBox.Location = new Point(111, 337);
             maskedTextBox.Name = "maskedTextBox";
             maskedTextBox.PasswordChar = '*';
             maskedTextBox.Size = new Size(249, 23);
@@ -243,7 +252,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(12, 312);
+            label6.Location = new Point(12, 340);
             label6.Name = "label6";
             label6.Size = new Size(93, 15);
             label6.TabIndex = 21;
@@ -292,12 +301,92 @@
             timer.Interval = 1000;
             timer.Tick += timer_Tick;
             // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(12, 271);
+            label8.Name = "label8";
+            label8.Size = new Size(59, 15);
+            label8.TabIndex = 27;
+            label8.Text = "ORCID ID:";
+            // 
+            // peerReviewBox
+            // 
+            peerReviewBox.Location = new Point(77, 268);
+            peerReviewBox.Name = "peerReviewBox";
+            peerReviewBox.Size = new Size(268, 23);
+            peerReviewBox.TabIndex = 26;
+            // 
+            // peerReviewBut
+            // 
+            peerReviewBut.Enabled = false;
+            peerReviewBut.Location = new Point(351, 268);
+            peerReviewBut.Name = "peerReviewBut";
+            peerReviewBut.Size = new Size(132, 23);
+            peerReviewBut.TabIndex = 28;
+            peerReviewBut.Text = "Peer Review Block";
+            peerReviewBut.UseVisualStyleBackColor = true;
+            peerReviewBut.Click += peerReviewBut_Click;
+            // 
+            // flagBut
+            // 
+            flagBut.Enabled = false;
+            flagBut.Location = new Point(351, 297);
+            flagBut.Name = "flagBut";
+            flagBut.Size = new Size(132, 23);
+            flagBut.TabIndex = 31;
+            flagBut.Text = "Fail Peer Review";
+            flagBut.UseVisualStyleBackColor = true;
+            flagBut.Click += flagBut_Click;
+            // 
+            // reputationLabel
+            // 
+            reputationLabel.AutoSize = true;
+            reputationLabel.Location = new Point(174, 9);
+            reputationLabel.Name = "reputationLabel";
+            reputationLabel.Size = new Size(68, 15);
+            reputationLabel.TabIndex = 32;
+            reputationLabel.Text = "Reputation:";
+            // 
+            // pendingBox
+            // 
+            pendingBox.FormattingEnabled = true;
+            pendingBox.Location = new Point(77, 240);
+            pendingBox.Name = "pendingBox";
+            pendingBox.Size = new Size(406, 23);
+            pendingBox.TabIndex = 33;
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Location = new Point(12, 243);
+            label10.Name = "label10";
+            label10.Size = new Size(54, 15);
+            label10.TabIndex = 34;
+            label10.Text = "Pending:";
+            // 
+            // textBox1
+            // 
+            textBox1.Location = new Point(489, 8);
+            textBox1.Multiline = true;
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(327, 352);
+            textBox1.TabIndex = 35;
+            // 
             // MainForm
             // 
             AcceptButton = loginBut;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(489, 361);
+            ClientSize = new Size(828, 410);
+            Controls.Add(textBox1);
+            Controls.Add(label10);
+            Controls.Add(pendingBox);
+            Controls.Add(reputationLabel);
+            Controls.Add(flagBut);
+            Controls.Add(peerReviewBut);
+            Controls.Add(label8);
+            Controls.Add(peerReviewBox);
             Controls.Add(getAddrBut);
             Controls.Add(sendToNameBox);
             Controls.Add(label7);
@@ -364,5 +453,13 @@
         private Button getAddrBut;
         private ToolStripStatusLabel toolStripStatusLabel2;
         private System.Windows.Forms.Timer timer;
+        private Label label8;
+        private TextBox peerReviewBox;
+        private Button peerReviewBut;
+        private Button flagBut;
+        private Label reputationLabel;
+        private ComboBox pendingBox;
+        private Label label10;
+        private TextBox textBox1;
     }
 }
