@@ -66,15 +66,23 @@
             pendingBox = new ComboBox();
             label10 = new Label();
             textBox1 = new TextBox();
+            tabControl1 = new TabControl();
+            tabPage1 = new TabPage();
+            tabPage2 = new TabPage();
+            tabPage3 = new TabPage();
             statusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)amountBox).BeginInit();
+            tabControl1.SuspendLayout();
+            tabPage1.SuspendLayout();
+            tabPage2.SuspendLayout();
+            tabPage3.SuspendLayout();
             SuspendLayout();
             // 
             // loginBut
             // 
-            loginBut.Location = new Point(366, 337);
+            loginBut.Location = new Point(345, 233);
             loginBut.Name = "loginBut";
-            loginBut.Size = new Size(117, 23);
+            loginBut.Size = new Size(132, 23);
             loginBut.TabIndex = 0;
             loginBut.Text = "Login";
             loginBut.UseVisualStyleBackColor = true;
@@ -83,9 +91,9 @@
             // statusStrip
             // 
             statusStrip.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel, toolStripStatusLabel2 });
-            statusStrip.Location = new Point(0, 388);
+            statusStrip.Location = new Point(0, 292);
             statusStrip.Name = "statusStrip";
-            statusStrip.Size = new Size(828, 22);
+            statusStrip.Size = new Size(493, 22);
             statusStrip.TabIndex = 1;
             statusStrip.Text = "statusStrip1";
             // 
@@ -103,7 +111,7 @@
             // balanceLabel
             // 
             balanceLabel.AutoSize = true;
-            balanceLabel.Location = new Point(12, 9);
+            balanceLabel.Location = new Point(6, 3);
             balanceLabel.Name = "balanceLabel";
             balanceLabel.Size = new Size(51, 15);
             balanceLabel.TabIndex = 2;
@@ -111,7 +119,7 @@
             // 
             // addrBox
             // 
-            addrBox.Location = new Point(77, 37);
+            addrBox.Location = new Point(71, 31);
             addrBox.Name = "addrBox";
             addrBox.Size = new Size(232, 23);
             addrBox.TabIndex = 3;
@@ -119,7 +127,7 @@
             // sendBut
             // 
             sendBut.Enabled = false;
-            sendBut.Location = new Point(402, 37);
+            sendBut.Location = new Point(396, 31);
             sendBut.Name = "sendBut";
             sendBut.Size = new Size(81, 23);
             sendBut.TabIndex = 4;
@@ -130,7 +138,7 @@
             // createBut
             // 
             createBut.Enabled = false;
-            createBut.Location = new Point(351, 211);
+            createBut.Location = new Point(345, 205);
             createBut.Name = "createBut";
             createBut.Size = new Size(132, 23);
             createBut.TabIndex = 5;
@@ -141,7 +149,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(12, 40);
+            label1.Location = new Point(6, 34);
             label1.Name = "label1";
             label1.Size = new Size(52, 15);
             label1.TabIndex = 8;
@@ -149,14 +157,14 @@
             // 
             // amountBox
             // 
-            amountBox.Location = new Point(315, 37);
+            amountBox.Location = new Point(309, 31);
             amountBox.Name = "amountBox";
             amountBox.Size = new Size(81, 23);
             amountBox.TabIndex = 9;
             // 
             // doiBox
             // 
-            doiBox.Location = new Point(77, 96);
+            doiBox.Location = new Point(71, 90);
             doiBox.Name = "doiBox";
             doiBox.Size = new Size(406, 23);
             doiBox.TabIndex = 10;
@@ -164,7 +172,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(11, 99);
+            label2.Location = new Point(5, 93);
             label2.Name = "label2";
             label2.Size = new Size(30, 15);
             label2.TabIndex = 11;
@@ -173,7 +181,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(12, 127);
+            label3.Location = new Point(6, 121);
             label3.Name = "label3";
             label3.Size = new Size(52, 15);
             label3.TabIndex = 12;
@@ -182,7 +190,7 @@
             // authorsBox
             // 
             authorsBox.FormattingEnabled = true;
-            authorsBox.Location = new Point(77, 124);
+            authorsBox.Location = new Point(71, 118);
             authorsBox.Name = "authorsBox";
             authorsBox.Size = new Size(406, 23);
             authorsBox.TabIndex = 13;
@@ -190,7 +198,7 @@
             // addByNameBut
             // 
             addByNameBut.Enabled = false;
-            addByNameBut.Location = new Point(351, 152);
+            addByNameBut.Location = new Point(345, 146);
             addByNameBut.Name = "addByNameBut";
             addByNameBut.Size = new Size(132, 23);
             addByNameBut.TabIndex = 14;
@@ -200,14 +208,14 @@
             // 
             // nameBox
             // 
-            nameBox.Location = new Point(77, 153);
+            nameBox.Location = new Point(71, 147);
             nameBox.Name = "nameBox";
             nameBox.Size = new Size(268, 23);
             nameBox.TabIndex = 15;
             // 
             // idBox
             // 
-            idBox.Location = new Point(77, 182);
+            idBox.Location = new Point(71, 176);
             idBox.Name = "idBox";
             idBox.Size = new Size(268, 23);
             idBox.TabIndex = 16;
@@ -215,7 +223,7 @@
             // addByIDBut
             // 
             addByIDBut.Enabled = false;
-            addByIDBut.Location = new Point(351, 182);
+            addByIDBut.Location = new Point(345, 176);
             addByIDBut.Name = "addByIDBut";
             addByIDBut.Size = new Size(132, 23);
             addByIDBut.TabIndex = 17;
@@ -226,7 +234,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(12, 156);
+            label4.Location = new Point(6, 150);
             label4.Name = "label4";
             label4.Size = new Size(42, 15);
             label4.TabIndex = 18;
@@ -235,7 +243,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(12, 185);
+            label5.Location = new Point(6, 179);
             label5.Name = "label5";
             label5.Size = new Size(59, 15);
             label5.TabIndex = 19;
@@ -243,16 +251,16 @@
             // 
             // maskedTextBox
             // 
-            maskedTextBox.Location = new Point(111, 337);
+            maskedTextBox.Location = new Point(105, 233);
             maskedTextBox.Name = "maskedTextBox";
             maskedTextBox.PasswordChar = '*';
-            maskedTextBox.Size = new Size(249, 23);
+            maskedTextBox.Size = new Size(234, 23);
             maskedTextBox.TabIndex = 20;
             // 
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(12, 340);
+            label6.Location = new Point(6, 236);
             label6.Name = "label6";
             label6.Size = new Size(93, 15);
             label6.TabIndex = 21;
@@ -261,7 +269,7 @@
             // updateBut
             // 
             updateBut.Enabled = false;
-            updateBut.Location = new Point(402, 8);
+            updateBut.Location = new Point(396, 2);
             updateBut.Name = "updateBut";
             updateBut.Size = new Size(81, 23);
             updateBut.TabIndex = 22;
@@ -272,7 +280,7 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(12, 70);
+            label7.Location = new Point(6, 64);
             label7.Name = "label7";
             label7.Size = new Size(42, 15);
             label7.TabIndex = 23;
@@ -280,7 +288,7 @@
             // 
             // sendToNameBox
             // 
-            sendToNameBox.Location = new Point(77, 66);
+            sendToNameBox.Location = new Point(71, 60);
             sendToNameBox.Name = "sendToNameBox";
             sendToNameBox.Size = new Size(232, 23);
             sendToNameBox.TabIndex = 24;
@@ -288,7 +296,7 @@
             // getAddrBut
             // 
             getAddrBut.Enabled = false;
-            getAddrBut.Location = new Point(315, 66);
+            getAddrBut.Location = new Point(309, 60);
             getAddrBut.Name = "getAddrBut";
             getAddrBut.Size = new Size(81, 23);
             getAddrBut.TabIndex = 25;
@@ -304,7 +312,7 @@
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new Point(12, 271);
+            label8.Location = new Point(8, 34);
             label8.Name = "label8";
             label8.Size = new Size(59, 15);
             label8.TabIndex = 27;
@@ -312,15 +320,14 @@
             // 
             // peerReviewBox
             // 
-            peerReviewBox.Location = new Point(77, 268);
+            peerReviewBox.Location = new Point(73, 31);
             peerReviewBox.Name = "peerReviewBox";
             peerReviewBox.Size = new Size(268, 23);
             peerReviewBox.TabIndex = 26;
             // 
             // peerReviewBut
             // 
-            peerReviewBut.Enabled = false;
-            peerReviewBut.Location = new Point(351, 268);
+            peerReviewBut.Location = new Point(347, 31);
             peerReviewBut.Name = "peerReviewBut";
             peerReviewBut.Size = new Size(132, 23);
             peerReviewBut.TabIndex = 28;
@@ -330,8 +337,7 @@
             // 
             // flagBut
             // 
-            flagBut.Enabled = false;
-            flagBut.Location = new Point(351, 297);
+            flagBut.Location = new Point(347, 60);
             flagBut.Name = "flagBut";
             flagBut.Size = new Size(132, 23);
             flagBut.TabIndex = 31;
@@ -342,7 +348,7 @@
             // reputationLabel
             // 
             reputationLabel.AutoSize = true;
-            reputationLabel.Location = new Point(174, 9);
+            reputationLabel.Location = new Point(168, 3);
             reputationLabel.Name = "reputationLabel";
             reputationLabel.Size = new Size(68, 15);
             reputationLabel.TabIndex = 32;
@@ -351,7 +357,7 @@
             // pendingBox
             // 
             pendingBox.FormattingEnabled = true;
-            pendingBox.Location = new Point(77, 240);
+            pendingBox.Location = new Point(73, 3);
             pendingBox.Name = "pendingBox";
             pendingBox.Size = new Size(406, 23);
             pendingBox.TabIndex = 33;
@@ -359,7 +365,7 @@
             // label10
             // 
             label10.AutoSize = true;
-            label10.Location = new Point(12, 243);
+            label10.Location = new Point(8, 6);
             label10.Name = "label10";
             label10.Size = new Size(54, 15);
             label10.TabIndex = 34;
@@ -367,50 +373,95 @@
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(489, 8);
+            textBox1.BackColor = Color.Black;
+            textBox1.Dock = DockStyle.Fill;
+            textBox1.ForeColor = Color.White;
+            textBox1.Location = new Point(3, 3);
             textBox1.Multiline = true;
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(327, 352);
+            textBox1.Size = new Size(479, 258);
             textBox1.TabIndex = 35;
+            // 
+            // tabControl1
+            // 
+            tabControl1.Controls.Add(tabPage1);
+            tabControl1.Controls.Add(tabPage2);
+            tabControl1.Controls.Add(tabPage3);
+            tabControl1.Dock = DockStyle.Fill;
+            tabControl1.Location = new Point(0, 0);
+            tabControl1.Name = "tabControl1";
+            tabControl1.SelectedIndex = 0;
+            tabControl1.Size = new Size(493, 292);
+            tabControl1.TabIndex = 36;
+            // 
+            // tabPage1
+            // 
+            tabPage1.Controls.Add(balanceLabel);
+            tabPage1.Controls.Add(reputationLabel);
+            tabPage1.Controls.Add(loginBut);
+            tabPage1.Controls.Add(getAddrBut);
+            tabPage1.Controls.Add(addrBox);
+            tabPage1.Controls.Add(sendToNameBox);
+            tabPage1.Controls.Add(sendBut);
+            tabPage1.Controls.Add(label7);
+            tabPage1.Controls.Add(createBut);
+            tabPage1.Controls.Add(updateBut);
+            tabPage1.Controls.Add(label1);
+            tabPage1.Controls.Add(label6);
+            tabPage1.Controls.Add(amountBox);
+            tabPage1.Controls.Add(maskedTextBox);
+            tabPage1.Controls.Add(doiBox);
+            tabPage1.Controls.Add(label5);
+            tabPage1.Controls.Add(label2);
+            tabPage1.Controls.Add(label4);
+            tabPage1.Controls.Add(label3);
+            tabPage1.Controls.Add(addByIDBut);
+            tabPage1.Controls.Add(authorsBox);
+            tabPage1.Controls.Add(idBox);
+            tabPage1.Controls.Add(addByNameBut);
+            tabPage1.Controls.Add(nameBox);
+            tabPage1.Location = new Point(4, 24);
+            tabPage1.Name = "tabPage1";
+            tabPage1.Padding = new Padding(3);
+            tabPage1.Size = new Size(485, 264);
+            tabPage1.TabIndex = 0;
+            tabPage1.Text = "Wallet";
+            tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            tabPage2.Controls.Add(textBox1);
+            tabPage2.Location = new Point(4, 24);
+            tabPage2.Name = "tabPage2";
+            tabPage2.Padding = new Padding(3);
+            tabPage2.Size = new Size(485, 264);
+            tabPage2.TabIndex = 1;
+            tabPage2.Text = "Console";
+            tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // tabPage3
+            // 
+            tabPage3.Controls.Add(pendingBox);
+            tabPage3.Controls.Add(label10);
+            tabPage3.Controls.Add(peerReviewBox);
+            tabPage3.Controls.Add(label8);
+            tabPage3.Controls.Add(peerReviewBut);
+            tabPage3.Controls.Add(flagBut);
+            tabPage3.Location = new Point(4, 24);
+            tabPage3.Name = "tabPage3";
+            tabPage3.Size = new Size(485, 264);
+            tabPage3.TabIndex = 2;
+            tabPage3.Text = "Peer Review";
+            tabPage3.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
             AcceptButton = loginBut;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(828, 410);
-            Controls.Add(textBox1);
-            Controls.Add(label10);
-            Controls.Add(pendingBox);
-            Controls.Add(reputationLabel);
-            Controls.Add(flagBut);
-            Controls.Add(peerReviewBut);
-            Controls.Add(label8);
-            Controls.Add(peerReviewBox);
-            Controls.Add(getAddrBut);
-            Controls.Add(sendToNameBox);
-            Controls.Add(label7);
-            Controls.Add(updateBut);
-            Controls.Add(label6);
-            Controls.Add(maskedTextBox);
-            Controls.Add(label5);
-            Controls.Add(label4);
-            Controls.Add(addByIDBut);
-            Controls.Add(idBox);
-            Controls.Add(nameBox);
-            Controls.Add(addByNameBut);
-            Controls.Add(authorsBox);
-            Controls.Add(label3);
-            Controls.Add(label2);
-            Controls.Add(doiBox);
-            Controls.Add(amountBox);
-            Controls.Add(label1);
-            Controls.Add(createBut);
-            Controls.Add(sendBut);
-            Controls.Add(addrBox);
-            Controls.Add(balanceLabel);
+            ClientSize = new Size(493, 314);
+            Controls.Add(tabControl1);
             Controls.Add(statusStrip);
-            Controls.Add(loginBut);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "MainForm";
             SizeGripStyle = SizeGripStyle.Hide;
@@ -419,6 +470,13 @@
             statusStrip.ResumeLayout(false);
             statusStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)amountBox).EndInit();
+            tabControl1.ResumeLayout(false);
+            tabPage1.ResumeLayout(false);
+            tabPage1.PerformLayout();
+            tabPage2.ResumeLayout(false);
+            tabPage2.PerformLayout();
+            tabPage3.ResumeLayout(false);
+            tabPage3.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -461,5 +519,9 @@
         private ComboBox pendingBox;
         private Label label10;
         private TextBox textBox1;
+        private TabControl tabControl1;
+        private TabPage tabPage1;
+        private TabPage tabPage2;
+        private TabPage tabPage3;
     }
 }

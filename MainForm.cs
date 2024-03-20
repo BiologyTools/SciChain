@@ -35,6 +35,7 @@ namespace SciChain
             updateBut.Enabled = true;
             getAddrBut.Enabled = true;
             ProcessTransaction(new Block.Transaction(Block.Transaction.Type.registration, null, wallet.PublicKey, ORCID.ORCID, Blockchain.gift));
+            GetPending(Peers.First().Value);
         }
 
         private void createBut_Click(object sender, EventArgs e)
@@ -87,6 +88,7 @@ namespace SciChain
         private void timer_Tick(object sender, EventArgs e)
         {
             toolStripStatusLabel2.Text = "Connections:" + Peers.Count.ToString() + " Height: " + Chain.Count;
+            updateBut.PerformClick();
             pendingBox.Items.Clear();
             pendingBox.Items.AddRange(PendingBlocks.ToArray());
             textBox1.Text = _writer.ToString();
