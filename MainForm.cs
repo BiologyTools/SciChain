@@ -22,8 +22,10 @@ namespace SciChain
             ORCID = await Orcid.GetAccessToken(token);
             wallet = new Blockchain.Wallet();
             wallet.Load(maskedTextBox.Text);
-            Initialize(wallet,ORCID.ORCID);
-            ConnectToPeer(peer, new ChatClient(peer, 8333), 8333);
+            Initialize(wallet);
+            ChatClient cl = new ChatClient(peer, 8333);
+            cl.ConnectAsync();
+            ConnectToPeer(peer, cl, 8333);
             Blockchain.Load();
             timer.Start();
             toolStripStatusLabel.Text = "Logged In:" + ORCID.Name + " " + ORCID.ORCID;
@@ -31,11 +33,11 @@ namespace SciChain
             sendBut.Enabled = true;
             addByIDBut.Enabled = true;
             addByNameBut.Enabled = true;
-            createBut.Enabled = true;
+            createBut.Enabled = true; 
             updateBut.Enabled = true;
             getAddrBut.Enabled = true;
             ProcessTransaction(new Block.Transaction(Block.Transaction.Type.registration, null, wallet.PublicKey, ORCID.ORCID, Blockchain.gift));
-            GetPending(Peers.First().Value);
+            GetPending(Peers.First().Value, PendingBlocks.Count);
         }
 
         private void createBut_Click(object sender, EventArgs e)
@@ -45,13 +47,19 @@ namespace SciChain
             {
                 list.Add(item.ToString());
             }
-            Block.Document doc = new Block.Document(doiBox.Text, list);
-            MineBlock(ORCID.ORCID, doc, wallet.PublicKey);
+            Block.Document doc = new Block.Document(doiBox.Text, list,wallet.PublicKey);
+            doc.SignDocument(wallet.PrivateKey,ORCID.ORCID);
+            Block bl = new Block(DateTime.Now, GetLatestBlock().Hash, null);
+            bl.BlockDocument = doc;
+            AddPendingBlock(bl);
+            //MineBlock(ORCID.ORCID, doc, wallet.PublicKey);
         }
 
         private void sendBut_Click(object sender, EventArgs e)
         {
-            ProcessTransaction(new Block.Transaction(Block.Transaction.Type.transaction, ORCID.ORCID, wallet.PublicKey, addrBox.Text, amountBox.Value));
+            Block.Transaction tr = new Block.Transaction(Block.Transaction.Type.transaction, ORCID.ORCID, wallet.PublicKey, addrBox.Text, amountBox.Value);
+            tr.SignTransaction(wallet.PrivateKey);
+            ProcessTransaction(tr);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -95,12 +103,16 @@ namespace SciChain
             textBox1.SelectionStart = textBox1.Text.Length;
             textBox1.ScrollToCaret();
         }
-
+        int block = -1;
         private void peerReviewBut_Click(object sender, EventArgs e)
         {
             Block.Transaction tr = new Block.Transaction(Block.Transaction.Type.review, null, wallet.PublicKey, ORCID.ORCID, Blockchain.gift);
-            tr.Data = PendingBlocks[pendingBox.SelectedIndex].Guid.ToString();
-            AddTransaction(tr);
+            tr.SignTransaction(wallet.PrivateKey);
+            if (block > -1)
+            {
+                tr.Data = PendingBlocks[block].GUID.ToString();
+                AddTransaction(tr);
+            }
         }
 
         private void toolStripStatusLabel_Click(object sender, EventArgs e)
@@ -111,8 +123,14 @@ namespace SciChain
         private void flagBut_Click(object sender, EventArgs e)
         {
             Block.Transaction tr = new Block.Transaction(Block.Transaction.Type.flag, null, wallet.PublicKey, ORCID.ORCID, Blockchain.gift);
-            tr.Data = PendingBlocks[pendingBox.SelectedIndex].Guid.ToString();
+            tr.SignTransaction(wallet.PrivateKey);
+            tr.Data = PendingBlocks[pendingBox.SelectedIndex].GUID.ToString();
             AddTransaction(tr);
+        }
+
+        private void pendingBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            block = pendingBox.SelectedIndex;
         }
     }
 }

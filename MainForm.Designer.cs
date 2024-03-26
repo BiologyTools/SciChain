@@ -58,18 +58,16 @@
             sendToNameBox = new TextBox();
             getAddrBut = new Button();
             timer = new System.Windows.Forms.Timer(components);
-            label8 = new Label();
-            peerReviewBox = new TextBox();
             peerReviewBut = new Button();
             flagBut = new Button();
             reputationLabel = new Label();
-            pendingBox = new ComboBox();
             label10 = new Label();
             textBox1 = new TextBox();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             tabPage2 = new TabPage();
             tabPage3 = new TabPage();
+            pendingBox = new ComboBox();
             statusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)amountBox).BeginInit();
             tabControl1.SuspendLayout();
@@ -309,22 +307,6 @@
             timer.Interval = 1000;
             timer.Tick += timer_Tick;
             // 
-            // label8
-            // 
-            label8.AutoSize = true;
-            label8.Location = new Point(8, 34);
-            label8.Name = "label8";
-            label8.Size = new Size(59, 15);
-            label8.TabIndex = 27;
-            label8.Text = "ORCID ID:";
-            // 
-            // peerReviewBox
-            // 
-            peerReviewBox.Location = new Point(73, 31);
-            peerReviewBox.Name = "peerReviewBox";
-            peerReviewBox.Size = new Size(268, 23);
-            peerReviewBox.TabIndex = 26;
-            // 
             // peerReviewBut
             // 
             peerReviewBut.Location = new Point(347, 31);
@@ -337,7 +319,7 @@
             // 
             // flagBut
             // 
-            flagBut.Location = new Point(347, 60);
+            flagBut.Location = new Point(209, 31);
             flagBut.Name = "flagBut";
             flagBut.Size = new Size(132, 23);
             flagBut.TabIndex = 31;
@@ -353,14 +335,6 @@
             reputationLabel.Size = new Size(68, 15);
             reputationLabel.TabIndex = 32;
             reputationLabel.Text = "Reputation:";
-            // 
-            // pendingBox
-            // 
-            pendingBox.FormattingEnabled = true;
-            pendingBox.Location = new Point(73, 3);
-            pendingBox.Name = "pendingBox";
-            pendingBox.Size = new Size(406, 23);
-            pendingBox.TabIndex = 33;
             // 
             // label10
             // 
@@ -443,8 +417,6 @@
             // 
             tabPage3.Controls.Add(pendingBox);
             tabPage3.Controls.Add(label10);
-            tabPage3.Controls.Add(peerReviewBox);
-            tabPage3.Controls.Add(label8);
             tabPage3.Controls.Add(peerReviewBut);
             tabPage3.Controls.Add(flagBut);
             tabPage3.Location = new Point(4, 24);
@@ -453,6 +425,15 @@
             tabPage3.TabIndex = 2;
             tabPage3.Text = "Peer Review";
             tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // pendingBox
+            // 
+            pendingBox.FormattingEnabled = true;
+            pendingBox.Location = new Point(73, 3);
+            pendingBox.Name = "pendingBox";
+            pendingBox.Size = new Size(406, 23);
+            pendingBox.TabIndex = 35;
+            pendingBox.SelectedIndexChanged += pendingBox_SelectedIndexChanged;
             // 
             // MainForm
             // 
@@ -511,17 +492,15 @@
         private Button getAddrBut;
         private ToolStripStatusLabel toolStripStatusLabel2;
         private System.Windows.Forms.Timer timer;
-        private Label label8;
-        private TextBox peerReviewBox;
         private Button peerReviewBut;
         private Button flagBut;
         private Label reputationLabel;
-        private ComboBox pendingBox;
         private Label label10;
         private TextBox textBox1;
         private TabControl tabControl1;
         private TabPage tabPage1;
         private TabPage tabPage2;
         private TabPage tabPage3;
+        private ComboBox pendingBox;
     }
 }
