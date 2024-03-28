@@ -1,6 +1,7 @@
 using static SciChain.Orcid;
 using static SciChain.Blockchain;
 using NetCoreServer;
+using System.Transactions;
 namespace SciChain
 {
     public partial class MainForm : Form
@@ -36,7 +37,9 @@ namespace SciChain
             createBut.Enabled = true; 
             updateBut.Enabled = true;
             getAddrBut.Enabled = true;
-            ProcessTransaction(new Block.Transaction(Block.Transaction.Type.registration, null, wallet.PublicKey, ORCID.ORCID, Blockchain.gift));
+            Block.Transaction tr = new Block.Transaction(Block.Transaction.Type.registration, null, wallet.PublicKey, ORCID.ORCID, Blockchain.gift);
+            tr.SignTransaction(wallet.PrivateKey);
+            AddTransaction(tr);
             GetPending(Peers.First().Value, PendingBlocks.Count);
         }
 
