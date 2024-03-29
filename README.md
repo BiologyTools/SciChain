@@ -1,4 +1,9 @@
-SciChain - Science Publishing and Peer Review Blockchain
+# Getting Started
+- Register by downloading the wallet software from Releases once installed choose a password for your wallet and press login. 
+- Then login with your ORCID credentials to start earning SciChain cryptocurrency for peer reviewing and adding your own publications to the chain.
+- Use the [blockexplorer](http://www.biologytools.net) to view latest blocks as well as chain statistics.
+
+# SciChain - Science Publishing and Peer Review Blockchain
 Welcome to SciChain! SciChain is a blockchain-based platform designed to revolutionize the world of science publishing and peer review. With its decentralized and transparent infrastructure, SciChain aims to address the challenges faced by traditional publishing and peer review systems, such as bias, inefficiency, and lack of transparency.
 
 Features: Current and future planned features.
