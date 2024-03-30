@@ -98,7 +98,7 @@ namespace SciChain
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            toolStripStatusLabel2.Text = "Connections:" + Peers.Count.ToString() + " Height: " + Chain.Count;
+            toolStripStatusLabel2.Text = "Connections:" + Peers.Count.ToString() + " Height: " + Chain.Count + " Treasury:" + GetTreasury();
             updateBut.PerformClick();
             pendingBox.Items.Clear();
             pendingBox.Items.AddRange(PendingBlocks.ToArray());
