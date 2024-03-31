@@ -1,4 +1,5 @@
 # Getting Started
+- Either download the full node software from Release if you have an ORCID ID, otherwise download just the [wallet software](https://github.com/BiologyTools/SciChainWallet)
 - Register by downloading the wallet software from Releases once installed choose a password for your wallet and press login. 
 - Then login with your ORCID credentials to start earning SciChain cryptocurrency for peer reviewing and adding your own publications to the chain.
 - Use the [blockexplorer](http://www.biologytools.net) to view latest blocks as well as chain statistics.
