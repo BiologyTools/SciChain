@@ -418,7 +418,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="gagegfg">
+                      <object class="GtkButton" id="loginBut">
                         <property name="label" translatable="yes">Login</property>
                         <property name="width-request">73</property>
                         <property name="visible">True</property>
