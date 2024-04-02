@@ -9,7 +9,7 @@
 - Install Mac package manager [homebrew.](https://brew.sh/)
 - From brew install [GTK3.](https://formulae.brew.sh/formula/gtk+3#default)
 - Download the SciChain application for either OSX-x64 or OSX-Arm from releases.
-- Make the .app bundle executable by opening terminal in the Contents/MacOS folder then run "chmod 755 BioGTKApp"
+- Make the .app bundle executable by opening terminal in the Contents/MacOS folder then run "chmod 755 SciChain"
 
 ## Windows Installation
 - Install package manager [MSYS2.](https://github.com/GtkSharp/GtkSharp/wiki/Installing-Gtk-on-Windows) to install package GTK3. (Required for GTK Apps.)
