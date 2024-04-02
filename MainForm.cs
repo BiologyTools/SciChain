@@ -50,6 +50,8 @@ namespace SciChain
         [Builder.Object]
         private Button loginBut;
         [Builder.Object]
+        private Button copyBut;
+        [Builder.Object]
         private ComboBox pendingBox;
         [Builder.Object]
         private Button peerReviewBut;
@@ -98,7 +100,13 @@ namespace SciChain
             peerReviewBut.Clicked += peerReviewBut_Click;
             failReviewBut.Clicked += flagBut_Click;
             statusLabel.ButtonPressEvent += StatusLabel_ButtonPressEvent;
+            copyBut.Clicked += CopyBut_Clicked;
             this.DestroyEvent += MainForm_DestroyEvent;
+        }
+
+        private void CopyBut_Clicked(object? sender, EventArgs e)
+        {
+            TextCopy.ClipboardService.SetText(ORCID.ORCID);
         }
 
         private void StatusLabel_ButtonPressEvent(object o, ButtonPressEventArgs args)

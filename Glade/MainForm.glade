@@ -391,7 +391,7 @@
                     </child>
                     <child>
                       <object class="GtkEntry" id="passwordBox">
-                        <property name="width-request">278</property>
+                        <property name="width-request">244</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                       </object>
@@ -403,9 +403,9 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="loginBut">
-                        <property name="label" translatable="yes">Login</property>
-                        <property name="width-request">145</property>
+                      <object class="GtkButton" id="copyBut">
+                        <property name="label" translatable="yes">Copy Address</property>
+                        <property name="width-request">73</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
@@ -415,6 +415,21 @@
                         <property name="fill">True</property>
                         <property name="pack-type">end</property>
                         <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="gagegfg">
+                        <property name="label" translatable="yes">Login</property>
+                        <property name="width-request">73</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">True</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="pack-type">end</property>
+                        <property name="position">3</property>
                       </packing>
                     </child>
                   </object>
@@ -551,7 +566,6 @@
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="halign">start</property>
-            <property name="label" translatable="yes">label</property>
           </object>
           <packing>
             <property name="expand">False</property>
