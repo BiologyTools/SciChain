@@ -97,7 +97,15 @@ namespace SciChain
             loginBut.Clicked += loginBut_Click;
             peerReviewBut.Clicked += peerReviewBut_Click;
             failReviewBut.Clicked += flagBut_Click;
+            statusLabel.ButtonPressEvent += StatusLabel_ButtonPressEvent;
             this.DestroyEvent += MainForm_DestroyEvent;
+        }
+
+        private void StatusLabel_ButtonPressEvent(object o, ButtonPressEventArgs args)
+        {
+            Clipboard clipboard = Clipboard.Get(Gdk.Selection.Clipboard);
+            // Set text to the clipboard
+            clipboard.Text = ORCID.ORCID;
         }
 
         private void MainForm_DestroyEvent(object o, DestroyEventArgs args)
@@ -183,7 +191,7 @@ namespace SciChain
                 do
                 {
                     // Retrieve the value in the first column of the current row
-                    string item = (string)pendingBox.Model.GetValue(iter, 0);
+                    string item = (string)box.Model.GetValue(iter, 0);
                     ls.AppendValues(item);
                 }
                 while (box.Model.IterNext(ref iter)); // Move to the next row
