@@ -16,6 +16,9 @@
     <Content Include="Glade\MainForm.glade">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="scichain.icns">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Dotnet.Bundle" Version="0.9.13" />
@@ -31,5 +34,19 @@
   <ItemGroup>
     <ProjectReference Include="..\SciChainLib\SciChainLib.csproj" />
   </ItemGroup>
-
+  <PropertyGroup>
+    <CFBundleName>SciChain</CFBundleName>
+    <!-- Also defines .app file name -->
+    <CFBundleDisplayName>SciChain</CFBundleDisplayName>
+    <CFBundleIdentifier>com.SciChain</CFBundleIdentifier>
+    <CFBundleVersion>0.3.0</CFBundleVersion>
+    <CFBundlePackageType>APPL</CFBundlePackageType>
+    <CFBundleSignature>????</CFBundleSignature>
+    <CFBundleExecutable>SciChain</CFBundleExecutable>
+    <CFBundleIconFile>scichain.icns</CFBundleIconFile>
+    <CFBundleShortVersionString>0.3.0</CFBundleShortVersionString>
+    <!-- Will be copied from output directory -->
+    <NSPrincipalClass>NSApplication</NSPrincipalClass>
+    <NSHighResolutionCapable>true</NSHighResolutionCapable>
+  </PropertyGroup>
 </Project>
