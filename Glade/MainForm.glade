@@ -394,6 +394,8 @@
                         <property name="width-request">244</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
+                        <property name="visibility">False</property>
+                        <property name="invisible-char">*</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -480,7 +482,7 @@
                     </child>
                     <child>
                       <object class="GtkComboBox" id="pendingBox">
-                        <property name="width-request">405</property>
+                        <property name="width-request">478</property>
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                       </object>

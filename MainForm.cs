@@ -104,9 +104,16 @@ namespace SciChain
             loginBut.Clicked += loginBut_Click;
             peerReviewBut.Clicked += peerReviewBut_Click;
             failReviewBut.Clicked += flagBut_Click;
-            statusLabel.ButtonPressEvent += StatusLabel_ButtonPressEvent;
             copyBut.Clicked += CopyBut_Clicked;
-            this.DestroyEvent += MainForm_DestroyEvent;
+            this.Destroyed += MainForm_Destroyed;
+        }
+
+        private void MainForm_Destroyed(object? sender, EventArgs e)
+        {
+            Save();
+            if(wallet != null)
+            wallet.Save(passwordBox.Buffer.Text);
+            Application.Quit();
         }
 
         /// <summary>
@@ -123,31 +130,6 @@ namespace SciChain
         private void CopyBut_Clicked(object? sender, EventArgs e)
         {
             TextCopy.ClipboardService.SetText(ORCID.ORCID);
-        }
-
-        private void StatusLabel_ButtonPressEvent(object o, ButtonPressEventArgs args)
-        {
-            Clipboard clipboard = Clipboard.Get(Gdk.Selection.Clipboard);
-            // Set text to the clipboard
-            clipboard.Text = ORCID.ORCID;
-        }
-
-        /// <summary>
-        /// The MainForm_DestroyEvent function saves data, saves wallet data with a password, and quits
-        /// the application.
-        /// </summary>
-        /// <param name="o">The parameter "o" in the MainForm_DestroyEvent method is typically used to
-        /// refer to the object that triggered the event. In this case, it could be the main form or
-        /// another object related to the destruction event.</param>
-        /// <param name="DestroyEventArgs">The `DestroyEventArgs` parameter in the
-        /// `MainForm_DestroyEvent` method is an event argument that provides information about the
-        /// event that triggered the destruction of the main form. It may contain additional data or
-        /// properties related to the destruction event.</param>
-        private void MainForm_DestroyEvent(object o, DestroyEventArgs args)
-        {
-            Save();
-            wallet.Save(passwordBox.Buffer.Text);
-            Application.Quit();
         }
 
         #endregion
@@ -184,7 +166,7 @@ namespace SciChain
             StartTimer();
             statusLabel.Text = "Logged In:" + ORCID.Name + " " + ORCID.ORCID;
             balanceLabel.Text = "Balance: " + GetBalance(ORCID.ORCID).ToString();
-            Block.Transaction tr = new Block.Transaction(Block.Transaction.Type.registration, null, wallet.PublicKey, ORCID.ORCID, Blockchain.gift);
+            Block.Transaction tr = new Block.Transaction(Block.Transaction.Type.registration, Blockchain.treasuryAddress, wallet.PublicKey, ORCID.ORCID, Blockchain.gift);
             tr.SignTransaction(wallet.PrivateKey);
             AddTransaction(tr);
             GetPending(Peers.First().Value, PendingBlocks.Count);
